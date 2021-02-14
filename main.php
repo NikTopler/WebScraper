@@ -59,9 +59,11 @@ class webScraping {
         $authorsUrl = array();
         $subtitle = $xpath->query('//div[@class="article__summary"]')->item(0)->nodeValue;
         $text = $xpath->query('//onl-article-body[@class="article__body-dynamic dev-article-contents"] //span //p');
-        $img = $xpath->query('//figure[@class="figure article__image figure--full"] //img')->item(0);
-        if($img == null || empty($img)) $img = null; 
-        else $img = $img->getAttribute('src');
+        $img = $xpath->query('//figure[@class="figure article__image figure--full"] //img');
+        $imgUrl = array();
+        if($img->item(0) != null && !empty($img->item(0))) 
+            for($j = 0; $j < count($img); $j++) 
+                array_push($imgUrl, $img[$j]->getAttribute('src'));
 
         $a = explode(',', $info);
         $b = explode('|', $a[2]);
@@ -99,7 +101,7 @@ class webScraping {
             'authors': ".$authorSchema.",
             'subtitle': `".$subtitle."`,
             'content': `".$fullText."`,
-            'urlToImage': `".$img."`,
+            'urlToImage': `".json_encode($imgUrl)."`,
             'urlToArticle': `".$this->website.$this->links[$l]."`
         }";
 
