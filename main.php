@@ -27,6 +27,23 @@ class webScraping {
     }
 
     public function loopThroughLinks() {
+        $articles = "{
+            'source': {
+                'name': '24ur',
+                'url': '".$this->website."'
+            },
+            'articles': [";
+
+        for($l = 0; $l < count($this->links); $l++) {
+            $data = $this->fetchDataFromLinks($l);
+
+            if($l == count($this->links) - 1) $comma = '';
+            else $comma = ',';
+
+            $articles = $articles.$data.$comma;
+        }
+        $articles = $articles.']}';
+        echo $articles;
     }    
 
     public function fetchDataFromLinks($l) {
