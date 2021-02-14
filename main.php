@@ -86,6 +86,22 @@ class webScraping {
         }
 
         foreach ($text as $a) { $fullText = $a->nodeValue; }
+
+        $schema = "{
+            'title': `".$title."`,
+            'info': {
+                'city': `".$info[0]."`,
+                'date': `".$info[1]."`,
+                'time': `".$info[0]."`,
+            },
+            'authors': ".$authorSchema.",
+            'subtitle': `".$subtitle."`,
+            'text': `".$fullText."`,
+            'picture': `".$img."`
+
+        }";
+        
+        return $schema;
     }
 }
 
