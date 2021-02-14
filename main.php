@@ -59,7 +59,9 @@ class webScraping {
         $authorsUrl = array();
         $subtitle = $xpath->query('//div[@class="article__summary"]')->item(0)->nodeValue;
         $text = $xpath->query('//onl-article-body[@class="article__body-dynamic dev-article-contents"] //span //p');
-        $img = $xpath->query('//figure[@class="figure article__image figure--full"] //img')->item(0)->getAttribute('src');
+        $img = $xpath->query('//figure[@class="figure article__image figure--full"] //img')->item(0);
+        if($img == null || empty($img)) $img = null; 
+        else $img = $img->getAttribute('src');
 
         $a = explode(',', $info);
         $b = explode('|', $a[2]);
@@ -98,9 +100,8 @@ class webScraping {
             'subtitle': `".$subtitle."`,
             'text': `".$fullText."`,
             'picture': `".$img."`
-
         }";
-        
+
         return $schema;
     }
 }
