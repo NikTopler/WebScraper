@@ -67,6 +67,23 @@ class webScraping {
         array_push($info, $a[0]);
         array_push($info, $a[1]);
         array_push($info, $b[0]);
+
+        foreach ($authorsNameElement as $name) {
+            $n = $name->nodeValue;
+            if($n != '/') array_push($authorName, $n);
+         }
+ 
+        foreach ($authors as $a) {
+            $aUrl = $a->getAttribute('href');
+            array_push($authorsUrl, $aUrl);
+        }
+
+        for($i = 0; $i < count($authorName); $i++) {
+            $authorSchema = "{
+                'name': '".$authorName[$i]."',
+                'url': '".$authorsUrl[$i]."'
+            }";
+        } 
     }
 }
 
