@@ -27,6 +27,7 @@ class webScraping {
     }
 
     public function loopThroughLinks() {
+
         $articles = "{
             'source': {
                 'name': '24ur',
@@ -59,6 +60,13 @@ class webScraping {
         $subtitle = $xpath->query('//div[@class="article__summary"]')->item(0)->nodeValue;
         $text = $xpath->query('//onl-article-body[@class="article__body-dynamic dev-article-contents"] //span //p');
         $img = $xpath->query('//figure[@class="figure article__image figure--full"] //img')->item(0)->getAttribute('src');
+
+        $a = explode(',', $info);
+        $b = explode('|', $a[2]);
+        $info = array();
+        array_push($info, $a[0]);
+        array_push($info, $a[1]);
+        array_push($info, $b[0]);
     }
 }
 
