@@ -1,7 +1,7 @@
 <?php
 
 class webScraping {
-    public $website = 'http://qlr.24ur.com';
+    public $website = 'http://24ur.com';
     public $links = array();
 
     public function setup($website) {
@@ -83,7 +83,7 @@ class webScraping {
         for($i = 0; $i < count($authorName); $i++) {
             $authorSchema = "{
                 'name': '".$authorName[$i]."',
-                'url': '".$authorsUrl[$i]."'
+                'url': '".$this->website.$authorsUrl[$i]."'
             }";
         }
 
@@ -98,8 +98,9 @@ class webScraping {
             },
             'authors': ".$authorSchema.",
             'subtitle': `".$subtitle."`,
-            'text': `".$fullText."`,
-            'picture': `".$img."`
+            'content': `".$fullText."`,
+            'urlToImage': `".$img."`,
+            'urlToArticle': `".$this->website.$this->links[$l]."`
         }";
 
         return $schema;
