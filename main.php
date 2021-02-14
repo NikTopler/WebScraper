@@ -47,6 +47,18 @@ class webScraping {
     }    
 
     public function fetchDataFromLinks($l) {
+        $link = $this->website.$this->links[$l];
+        $xpath = $this->setup($link);
+
+        $title = $xpath->query('//h1[@class="article__title"]')->item(0)->nodeValue;
+        $info = $xpath->query('//p[@class="article__info"]')->item(0)->nodeValue;
+        $authors = $xpath->query('//a[@class="c-pointer link link--plain"]');
+        $authorsNameElement = $xpath->query('//a[@class="c-pointer link link--plain"]//text()');
+        $authorName = array();
+        $authorsUrl = array();
+        $subtitle = $xpath->query('//div[@class="article__summary"]')->item(0)->nodeValue;
+        $text = $xpath->query('//onl-article-body[@class="article__body-dynamic dev-article-contents"] //span //p');
+        $img = $xpath->query('//figure[@class="figure article__image figure--full"] //img')->item(0)->getAttribute('src');
     }
 }
 
@@ -55,7 +67,3 @@ $scrape = new webScraping();
 $xpath = $scrape->setup($scrape->website.'/novice');
 $scrape->getLinks($xpath);
 $scrape->loopThroughLinks();
-
-
-
-
