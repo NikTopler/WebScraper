@@ -18,6 +18,12 @@ class webScraping {
     }
 
     public function getLinks($xpath) {
+        $linkElements = $xpath->query('//div[@class="news-list__item"] //a[contains(concat(" ", normalize-space(@class), " "), "card")]');
+    
+        foreach ($linkElements as $linkElement) {
+            $newLinkArray = $linkElement->getAttribute('href');
+            array_push($this->links, $newLinkArray);
+        }
     }
 
     public function loopThroughLinks() {
