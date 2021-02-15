@@ -28,12 +28,12 @@ class webScraping {
 
     public function loopThroughLinks() {
 
-        $articles = "{
-            'source': {
-                'name': '24ur',
-                'url': '".$this->website."'
+        $articles = '{
+            "source": {
+                "name": "24ur",
+                "url": "'.$this->website.'"
             },
-            'articles': [";
+            "articles": [';
 
         for($l = 0; $l < count($this->links); $l++) {
             $data = $this->fetchDataFromLinks($l);
@@ -83,27 +83,27 @@ class webScraping {
         }
 
         for($i = 0; $i < count($authorName); $i++) {
-            $authorSchema = "{
-                'name': '".$authorName[$i]."',
-                'url': '".$this->website.$authorsUrl[$i]."'
-            }";
+            $authorSchema = '{
+                "name": "'.$authorName[$i].'",
+                "url": "'.$this->website.$authorsUrl[$i].'"
+            }';
         }
 
         foreach ($text as $a) { $fullText = $a->nodeValue; }
 
-        $schema = "{
-            'title': `".$title."`,
-            'info': {
-                'city': `".$info[0]."`,
-                'date': `".$info[1]."`,
-                'time': `".$info[0]."`,
+        $schema = '{
+            "title": "'.str_replace("\"","'", $title).'",
+            "info": {
+                "city": "'.$info[0].'",
+                "date": "'.$info[1].'",
+                "time": "'.str_replace(' ', '', $info[2]).'"
             },
-            'authors': ".$authorSchema.",
-            'subtitle': `".$subtitle."`,
-            'content': `".$fullText."`,
-            'urlToImage': `".json_encode($imgUrl)."`,
-            'urlToArticle': `".$this->website.$this->links[$l]."`
-        }";
+            "authors": '.$authorSchema.',
+            "subtitle": "'.str_replace("\"","'", $subtitle).'",
+            "content": "'.str_replace("\"","'", $fullText).'",
+            "urlToImage": '.json_encode($imgUrl).',
+            "urlToArticle": "'.$this->website.$this->links[$l].'"
+        }';
 
         return $schema;
     }
