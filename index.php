@@ -82,12 +82,17 @@ class webScraping {
             array_push($authorsUrl, $aUrl);
         }
 
+        $authorSchema = '[';
         for($i = 0; $i < count($authorName); $i++) {
-            $authorSchema = '{
+            if($i >= 1) $comma = ',';
+            else $comma = '';
+
+            $authorSchema = $authorSchema.$comma.'{
                 "name": "'.$authorName[$i].'",
                 "url": "'.$this->website.$authorsUrl[$i].'"
             }';
         }
+        $authorSchema = $authorSchema.']';
 
         foreach ($text as $a) { $fullText = $a->nodeValue; }
 
