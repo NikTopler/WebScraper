@@ -1,6 +1,6 @@
 <?php
 
-class webScraping {
+class WebScraping {
     public $website = 'http://24ur.com';
     public $links = array();
 
@@ -114,7 +114,7 @@ class webScraping {
     }
 }
 
-$scrape = new webScraping();
+$scrape = new WebScraping();
 
 $xpath = $scrape->setup($scrape->website.'/novice');
 $scrape->getLinks($xpath);
