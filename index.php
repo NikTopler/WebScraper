@@ -1,55 +1,78 @@
 <?php
 
 class WebScraping {
-    public $website = 'http://24ur.com';
-    public $links = array();
 
-    public function setup($website) {
+    private $website = 'http://24ur.com';
+
+    function __construct() {
+
+        $file_content = $this->file_content($this->website.'/novice');
+        
+        if(!$file_content) {
+            echo json_encode(
+                array(
+                    'status' => 200,
+                    'message'=> `Coudn't load `.$this->website.`/novice`
+                )
+            );
+            return;
+        }
+
+        $links = array();
+        $articles = array();
+        $this->get_links($file_content, $links);
+
+        for($i = 0; $i < count($links); $i++) {
+            $res = $this->fetch_articles($i, $links);
+            
+            if($res != -1)
+                array_push($articles, $res);
+        }
+
+        $schema = array(
+            'source' => array(
+                'name' => '24ur',
+                'url' => $this->website
+            ), 
+            'articles' => $articles
+        );
+
+        echo json_encode($schema);
+    }
+
+    private function file_content($website) {
         $html = file_get_contents($website);
         $news_doc = new DOMDocument();
     
         libxml_use_internal_errors(TRUE);
-        if(empty($html)) die;
-    
+
+        if(empty($html)) {
+            error_log('Err', `Couldn't open `.$website);
+            return null;
+        }
+
         $news_doc->loadHTML($html);
-        libxml_clear_errors();
-    
+        libxml_clear_errors();  
+        
         return new DOMXPath($news_doc);
     }
 
-    public function getLinks($xpath) {
-        $linkElements = $xpath->query('//div[@class="news-list__item"] //a[contains(concat(" ", normalize-space(@class), " "), "card")]');
-    
+    private function get_links($xpath, & $links) {
+        $linkElements = $xpath->query('//div[@class="news-list__item"] //a[contains(concat(" ", normalize-space(@class), " "), "card")]'); 
+
         foreach ($linkElements as $linkElement) {
             $newLinkArray = $linkElement->getAttribute('href');
-            array_push($this->links, $newLinkArray);
+            array_push($links, $newLinkArray);
         }
-    }
+    }  
 
-    public function loopThroughLinks() {
+    private function fetch_articles($num, $links) {
 
-        $articles = '{
-            "source": {
-                "name": "24ur",
-                "url": "'.$this->website.'"
-            },
-            "articles": [';
+        $link = $this->website.$links[$num];
+        $xpath = $this->file_content($link);
 
-        for($l = 0; $l < count($this->links); $l++) {
-            $data = $this->fetchDataFromLinks($l);
-
-            if($l == count($this->links) - 1) $comma = '';
-            else $comma = ',';
-
-            $articles = $articles.$data.$comma;
-        }
-        $articles = $articles.']}';
-        echo $articles;
-    }    
-
-    public function fetchDataFromLinks($l) {
-        $link = $this->website.$this->links[$l];
-        $xpath = $this->setup($link);
+        if(!$xpath)
+            return -1;
 
         $title = $xpath->query('//h1[@class="article__title"]')->item(0)->nodeValue;
         $info = $xpath->query('//p[@class="article__info"]')->item(0)->nodeValue;
@@ -73,8 +96,9 @@ class WebScraping {
         array_push($info, $b[0]);
       
         foreach ($authorsNameElement as $name) {
-           $n = $name->nodeValue;
-           if($n != '/') array_push($authorName, $n);
+            $n = $name->nodeValue;
+            if($n != '/') 
+                array_push($authorName, $n);
         }
 
         foreach ($authors as $a) {
@@ -82,40 +106,34 @@ class WebScraping {
             array_push($authorsUrl, $aUrl);
         }
 
-        $authorSchema = '[';
-        for($i = 0; $i < count($authorName); $i++) {
-            if($i >= 1) $comma = ',';
-            else $comma = '';
+        $authorSchema = array();
+        for($i = 0; $i < count($authorName); $i++)
+            array_push($authorSchema, array(
+                'name' => $authorName[$i], 
+                'url' => $this->website.$authorsUrl[$i])
+            );
 
-            $authorSchema = $authorSchema.$comma.'{
-                "name": "'.$authorName[$i].'",
-                "url": "'.$this->website.$authorsUrl[$i].'"
-            }';
-        }
-        $authorSchema = $authorSchema.']';
 
-        foreach ($text as $a) { $fullText = $a->nodeValue; }
+        foreach ($text as $a) 
+            $fullText = $a->nodeValue;
 
-        $schema = '{
-            "title": "'.str_replace("\"","'", $title).'",
-            "info": {
-                "city": "'.$info[0].'",
-                "date": "'.$info[1].'",
-                "time": "'.str_replace(' ', '', $info[2]).'"
-            },
-            "authors": '.$authorSchema.',
-            "subtitle": "'.str_replace("\"","'", $subtitle).'",
-            "content": "'.str_replace("\"","'", $fullText).'",
-            "urlToImage": '.json_encode($imgUrl).',
-            "urlToArticle": "'.$this->website.$this->links[$l].'"
-        }';
+
+        $schema = array(
+            'title' => str_replace("\"","'", $title),
+            'info' => array(
+                'city' => $info[0],
+                'date' => $info[1],
+                'time' => str_replace(' ', '', $info[2])
+            ),
+            'authors' => $authorSchema,
+            'subtitle' => str_replace("\"","'", $subtitle),
+            'content' => str_replace("\"","'", $fullText),
+            'urlToImage' => json_encode($imgUrl),
+            'urlToArticle' => $this->website.$links[$num]
+        );            
 
         return $schema;
     }
 }
 
-$scrape = new WebScraping();
-
-$xpath = $scrape->setup($scrape->website.'/novice');
-$scrape->getLinks($xpath);
-$scrape->loopThroughLinks();
+new WebScraping();
